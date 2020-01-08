@@ -28,4 +28,4 @@ spec:
     mariadb:
       master:
         persistence:
-          enabled: false
+          enabled: true
