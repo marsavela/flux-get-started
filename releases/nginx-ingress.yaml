@@ -9,7 +9,7 @@ metadata:
   labels:
     name: nginx-ingress
   name: nginx-ingress
-  namespace: nginx
+  namespace: nginx-ingress
 spec:
   chart:
     name: nginx-ingress
