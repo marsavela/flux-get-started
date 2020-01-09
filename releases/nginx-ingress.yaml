@@ -1,0 +1,61 @@
+---
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  annotations:
+    fluxcd.io/automated: false
+    fluxcd.io/ignore: false
+    fluxcd.io/tag.chart-image: glob:*
+  labels:
+    name: nginx-ingress
+  name: nginx-ingress
+  namespace: nginx
+spec:
+  chart:
+    name: nginx-ingress
+    repository: https://kubernetes-charts.storage.googleapis.com/
+    rollback:
+      disableHooks: true
+      enable: false
+      force: false
+      timeout: 600
+      wait: true
+    version: 1.26.1
+  releaseName: nginx-ingress
+  targetNamespace: nginx-ingress
+  values:
+    controller:
+      config:
+        hsts: 'true'
+        hsts-include-subdomains: 'true'
+        http-snippet: "map $geoip_country_code $allowed_country {\n    default yes;\n    CU no;\n    IR no;\n    KP no;\n    SD no;\n    SY no;\n    UA no;\n}\nadd_header X-Content-Type-Options nosniff;\nadd_header X-Frame-Options sameorigin;\nadd_header X-XSS-Protection 1;"
+        server-snippet: "if ($allowed_country = no) {\n    return 444;\n}"
+        server-tokens: 'False'
+      extraArgs:
+        v: 2
+      image:
+        repository: quay.io/kubernetes-ingress-controller/nginx-ingress-controller
+        tag: 0.26.1
+      priorityClassName: common-high
+      publishService:
+        enabled: true
+      replicaCount: 2
+      resources:
+        limits:
+          cpu: 100m
+          memory: 64Mi
+        requests:
+          cpu: 100m
+          memory: 64Mi
+    defaultBackend:
+      image:
+        repository: k8s.gcr.io/defaultbackend-amd64
+        tag: '1.5'
+      priorityClassName: common-high
+      resources:
+        limits:
+          cpu: 10m
+          memory: 20Mi
+        requests:
+          cpu: 10m
+          memory: 20Mi
